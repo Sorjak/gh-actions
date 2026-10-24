@@ -1,0 +1,43 @@
+name: update-argocd-repo
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+      repo_name:
+        required: true
+        type: string
+jobs:
+  update-argocd-repo:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Update values.yaml in source repo
+      uses: fjogeleit/yaml-update-action@main
+      with:
+        valueFile: 'source-repo/k8s/values.yaml'
+        propertyPath: 'service.tag'
+        value: ${{ inputs.tag_name }}
+        commitChange: false
+
+    - name: Checkout the destination repo (Ninetales ArgoCD)
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.repository_owner }}/ninetales-argocd
+        token: ${{ secrets.ACTIONS_PAT }}
+        path: ninetales-argocd
+
+    - name: Copy Changes from source to destination repo
+      run: |
+        mkdir -p ninetales-argocd/apps/${{ inputs.repo_name }}
+        rm -rf ninetales-argocd/apps/${{ inputs.repo_name }}/*
+        cp -r source-repo/k8s/* ninetales-argocd/apps/${{ inputs.repo_name }}
+
+    - name: Commit and Push using Git commands
+      run: |
+        cd ninetales-argocd
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Automated update ${{ inputs.tag_name }} from ${{ inputs.repo_name }}"
+        git push
