@@ -8,9 +8,6 @@ on:
       repo_name:
         required: true
         type: string
-      argcd_repo_token:
-        required: true
-        type: string
 jobs:
   update-argocd-repo:
     runs-on: ubuntu-latest
@@ -32,7 +29,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: ${{ github.repository_owner }}/ninetales-argocd
-        token: ${{ inputs.argcd_repo_token }}
+        token: ${{ secrets.ACTIONS_PAT }}
         path: ninetales-argocd
 
     - name: Copy Changes from source to destination repo
