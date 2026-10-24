@@ -12,6 +12,11 @@ jobs:
   update-argocd-repo:
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        path: source-repo
+
     - name: Update values.yaml in source repo
       uses: fjogeleit/yaml-update-action@main
       with:
