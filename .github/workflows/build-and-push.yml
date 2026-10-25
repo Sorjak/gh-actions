@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       # Grant write permissions for the GITHUB_TOKEN to commit and create a PR
-      contents: write
+      contents: read
 
     steps:
       - name: Checkout repository
